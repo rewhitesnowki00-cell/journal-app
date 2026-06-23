@@ -5,8 +5,10 @@ import { sendPush } from "@/lib/web-push";
 // Vercel Cron から定期実行される。リマインド期限が来た未送信タスクを通知する。
 export const dynamic = "force-dynamic";
 
-// 古すぎるリマインドは送らず握りつぶす猶予（cron停止や通知後付け有効化による一斉送信を防ぐ）
-const GRACE_MS = 24 * 60 * 60 * 1000;
+// 古すぎるリマインドは送らず握りつぶす猶予。
+// Hobbyプランのcronは1日1回(0 23 * * *)なので、24時間の隙間で取りこぼさないよう
+// 余裕を持たせて26時間にする（cron停止や通知後付け有効化による一斉送信は依然防ぐ）。
+const GRACE_MS = 26 * 60 * 60 * 1000;
 
 /** 定数時間で Bearer トークンを比較する（タイミング攻撃対策）。 */
 function isAuthorized(authHeader: string | null, secret: string | undefined): boolean {
