@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja" className={`${geist.variable} h-full antialiased`}>
       <body className="min-h-full bg-[#FAFAF9]">
-        <main className="mx-auto max-w-2xl pb-20">{children}</main>
+        <main className="mx-auto max-w-2xl pb-36">{children}</main>
         <BottomNav />
       </body>
     </html>
