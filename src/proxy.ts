@@ -49,5 +49,13 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // 認可を自前で行う公開エンドポイントだけを限定的に除外する（過剰除外を避ける）:
+  //  - api/calendar … 秘密トークンURLで認可（Cookie認証不可）
+  //  - api/cron     … CRON_SECRET で認可
+  //  - sw.js        … Service Worker（ログイン前でも取得が必要）
+  //  - 静的アセット  … _next, 画像, manifest
+  // ※ 上記以外の /api を将来追加する場合、middleware を通らないので各自で認可すること。
+  matcher: [
+    "/((?!_next/static|_next/image|api/calendar|api/cron|sw.js|favicon.ico|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

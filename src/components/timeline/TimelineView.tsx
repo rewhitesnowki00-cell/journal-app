@@ -53,10 +53,10 @@ export default function TimelineView({ tasks, conversations, personNames }: Prop
 
   return (
     <div>
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-[#FAFAF9] px-4 py-3">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/60 bg-[#FAFAF9]/80 px-4 py-3 backdrop-blur">
         <h1 className="text-base font-semibold">📅 タイムライン</h1>
         <button onClick={openFab}
-          className="flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 active:scale-95 transition-transform">
+          className="flex items-center gap-1.5 rounded-full bg-indigo-600 px-3.5 py-1.5 text-sm font-medium text-white shadow-sm shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 transition-transform">
           <Plus size={16} />追加
         </button>
       </div>

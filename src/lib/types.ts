@@ -5,6 +5,7 @@ export interface Task {
   title: string;
   status: TaskStatus;
   dueDate: string | null; // ISO date string YYYY-MM-DD
+  remindAt: string | null; // ISO datetime string（リマインド通知の送信予定日時。null = 通知なし）
   memo: string;
   createdAt: string;
 }

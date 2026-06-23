@@ -9,14 +9,29 @@ export const metadata: Metadata = {
   title: "日誌・タスク管理",
   description: "会話ログとタスクをまとめて管理",
   manifest: "/manifest.json",
-  viewport: { width: "device-width", initialScale: 1, viewportFit: "cover" },
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/icon-192.png", // iOS ホーム画面用
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "日誌",
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+  themeColor: "#6366F1",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja" className={`${geist.variable} h-full antialiased`}>
       <body className="min-h-full bg-[#FAFAF9]">
-        <main className="mx-auto max-w-2xl pb-36">{children}</main>
+        <main className="mx-auto max-w-2xl pb-28">{children}</main>
         <BottomNav />
       </body>
     </html>

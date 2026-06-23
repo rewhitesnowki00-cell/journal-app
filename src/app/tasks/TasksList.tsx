@@ -6,7 +6,7 @@ import { Task, TaskStatus } from "@/lib/types";
 import { updateTaskStatus, deleteTask } from "@/lib/actions/tasks";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import TaskForm from "@/components/forms/TaskForm";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, Bell } from "lucide-react";
 
 const TABS: (TaskStatus | "全て")[] = ["全て", "未着手", "進行中", "完了"];
 
@@ -50,11 +50,11 @@ export default function TasksList({ initialTasks }: { initialTasks: Task[] }) {
 
   return (
     <div style={{ opacity: isPending ? 0.6 : 1 }}>
-      <div className="sticky top-0 z-10 border-b bg-[#FAFAF9] px-4 py-3">
+      <div className="sticky top-0 z-10 border-b border-border/60 bg-[#FAFAF9]/80 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-between">
           <h1 className="text-base font-semibold">✅ タスク一覧</h1>
           <button onClick={() => { setEditingTask(null); setSheetOpen(true); }}
-            className="flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">
+            className="flex items-center gap-1.5 rounded-full bg-indigo-600 px-3.5 py-1.5 text-sm font-medium text-white shadow-sm shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 transition-transform">
             <Plus size={16} />追加
           </button>
         </div>
@@ -84,6 +84,12 @@ export default function TasksList({ initialTasks }: { initialTasks: Task[] }) {
                   {task.dueDate && (
                     <p className={`mt-0.5 text-xs ${overdue ? "text-red-500 font-medium" : "text-muted-foreground"}`}>
                       締切：{task.dueDate.replace(/-/g, "/")} {overdue && "（期限超過）"}
+                    </p>
+                  )}
+                  {task.remindAt && (
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-indigo-600">
+                      <Bell size={11} />
+                      {new Date(task.remindAt).toLocaleString("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                     </p>
                   )}
                   {task.memo && <p className="mt-0.5 text-xs text-muted-foreground">{task.memo}</p>}

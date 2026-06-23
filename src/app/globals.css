@@ -129,7 +129,7 @@
   }
 }
 
-/* iPhone のホームバー分の余白 + 10mm 上げる */
+/* iPhone のホームバー分のセーフエリアのみを確保（過剰な固定オフセットは廃止） */
 .pb-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 38px);
+  padding-bottom: env(safe-area-inset-bottom);
 }

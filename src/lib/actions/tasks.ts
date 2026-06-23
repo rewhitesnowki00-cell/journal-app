@@ -15,6 +15,7 @@ export async function createTask(data: {
   title: string;
   status: TaskStatus;
   dueDate: string | null;
+  remindAt: string | null;
   memo: string;
 }) {
   const { supabase, user } = await getUser();
@@ -23,6 +24,7 @@ export async function createTask(data: {
     title: data.title,
     status: data.status,
     due_date: data.dueDate || null,
+    remind_at: data.remindAt || null,
     memo: data.memo,
   });
   if (error) throw new Error(error.message);
@@ -46,12 +48,21 @@ export async function updateTask(id: string, data: {
   title: string;
   status: TaskStatus;
   dueDate: string | null;
+  remindAt: string | null;
   memo: string;
 }) {
   const { supabase, user } = await getUser();
+  // リマインド日時が変わったら未送信状態（reminded_at = null）に戻し、再送信できるようにする
   const { error } = await supabase
     .from("tasks")
-    .update({ title: data.title, status: data.status, due_date: data.dueDate || null, memo: data.memo })
+    .update({
+      title: data.title,
+      status: data.status,
+      due_date: data.dueDate || null,
+      remind_at: data.remindAt || null,
+      reminded_at: null,
+      memo: data.memo,
+    })
     .eq("id", id)
     .eq("user_id", user.id);
   if (error) throw new Error(error.message);
@@ -84,6 +95,7 @@ export async function getTasks() {
     title: t.title,
     status: t.status as TaskStatus,
     dueDate: t.due_date,
+    remindAt: t.remind_at,
     memo: t.memo ?? "",
     createdAt: t.created_at,
   }));
