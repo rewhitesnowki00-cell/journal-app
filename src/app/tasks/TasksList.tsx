@@ -6,7 +6,7 @@ import { Task, TaskStatus } from "@/lib/types";
 import { updateTaskStatus, deleteTask } from "@/lib/actions/tasks";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import TaskForm from "@/components/forms/TaskForm";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 
 const TABS: (TaskStatus | "全て")[] = ["全て", "未着手", "進行中", "完了"];
 
@@ -23,6 +23,7 @@ const STATUS_CYCLE: Record<TaskStatus, TaskStatus> = {
 export default function TasksList({ initialTasks }: { initialTasks: Task[] }) {
   const [tab, setTab] = useState<TaskStatus | "全て">("全て");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
@@ -52,7 +53,7 @@ export default function TasksList({ initialTasks }: { initialTasks: Task[] }) {
       <div className="sticky top-0 z-10 border-b bg-[#FAFAF9] px-4 py-3">
         <div className="flex items-center justify-between">
           <h1 className="text-base font-semibold">✅ タスク一覧</h1>
-          <button onClick={() => setSheetOpen(true)}
+          <button onClick={() => { setEditingTask(null); setSheetOpen(true); }}
             className="flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">
             <Plus size={16} />追加
           </button>
@@ -92,6 +93,9 @@ export default function TasksList({ initialTasks }: { initialTasks: Task[] }) {
                     className={`rounded-full border px-2 py-0.5 text-xs font-medium transition-colors ${STATUS_STYLES[task.status]}`}>
                     {task.status}
                   </button>
+                  <button onClick={() => { setEditingTask(task); setSheetOpen(true); }} className="text-muted-foreground hover:text-foreground">
+                    <Pencil size={14} />
+                  </button>
                   <button onClick={() => handleDelete(task.id)} className="text-muted-foreground hover:text-destructive">
                     <Trash2 size={14} />
                   </button>
@@ -105,11 +109,12 @@ export default function TasksList({ initialTasks }: { initialTasks: Task[] }) {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl">
           <SheetHeader className="px-4 pt-2 pb-0">
-            <SheetTitle className="text-left text-base">タスクを追加</SheetTitle>
+            <SheetTitle className="text-left text-base">{editingTask ? "タスクを編集" : "タスクを追加"}</SheetTitle>
           </SheetHeader>
           <TaskForm
-            onSaved={() => { setSheetOpen(false); router.refresh(); }}
-            onCancel={() => setSheetOpen(false)}
+            editTask={editingTask ?? undefined}
+            onSaved={() => { setSheetOpen(false); setEditingTask(null); router.refresh(); }}
+            onCancel={() => { setSheetOpen(false); setEditingTask(null); }}
           />
         </SheetContent>
       </Sheet>

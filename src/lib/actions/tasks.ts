@@ -42,6 +42,23 @@ export async function updateTaskStatus(id: string, status: TaskStatus) {
   revalidatePath("/tasks");
 }
 
+export async function updateTask(id: string, data: {
+  title: string;
+  status: TaskStatus;
+  dueDate: string | null;
+  memo: string;
+}) {
+  const { supabase, user } = await getUser();
+  const { error } = await supabase
+    .from("tasks")
+    .update({ title: data.title, status: data.status, due_date: data.dueDate || null, memo: data.memo })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/tasks");
+}
+
 export async function deleteTask(id: string) {
   const { supabase, user } = await getUser();
   const { error } = await supabase

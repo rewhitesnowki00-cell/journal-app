@@ -128,3 +128,8 @@
     @apply font-sans;
   }
 }
+
+/* iPhone のホームバー分の余白 */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

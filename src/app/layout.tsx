@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "日誌・タスク管理",
   description: "会話ログとタスクをまとめて管理",
   manifest: "/manifest.json",
+  viewport: { width: "device-width", initialScale: 1, viewportFit: "cover" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

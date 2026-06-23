@@ -4,27 +4,32 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createTask } from "@/lib/actions/tasks";
-import { TaskStatus } from "@/lib/types";
+import { createTask, updateTask } from "@/lib/actions/tasks";
+import { TaskStatus, Task } from "@/lib/types";
 
 interface Props {
   defaultDueDate?: string;
+  editTask?: Task;
   onSaved: () => void;
   onCancel: () => void;
 }
 
-export default function TaskForm({ defaultDueDate, onSaved, onCancel }: Props) {
-  const [title, setTitle] = useState("");
-  const [status, setStatus] = useState<TaskStatus>("未着手");
-  const [dueDate, setDueDate] = useState(defaultDueDate ?? "");
-  const [memo, setMemo] = useState("");
+export default function TaskForm({ defaultDueDate, editTask, onSaved, onCancel }: Props) {
+  const [title, setTitle] = useState(editTask?.title ?? "");
+  const [status, setStatus] = useState<TaskStatus>(editTask?.status ?? "未着手");
+  const [dueDate, setDueDate] = useState(editTask?.dueDate ?? defaultDueDate ?? "");
+  const [memo, setMemo] = useState(editTask?.memo ?? "");
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
     startTransition(async () => {
-      await createTask({ title: title.trim(), status, dueDate: dueDate || null, memo: memo.trim() });
+      if (editTask) {
+        await updateTask(editTask.id, { title: title.trim(), status, dueDate: dueDate || null, memo: memo.trim() });
+      } else {
+        await createTask({ title: title.trim(), status, dueDate: dueDate || null, memo: memo.trim() });
+      }
       onSaved();
     });
   }
@@ -55,7 +60,7 @@ export default function TaskForm({ defaultDueDate, onSaved, onCancel }: Props) {
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="outline" onClick={onCancel} className="flex-1">キャンセル</Button>
         <Button type="submit" disabled={isPending} className="flex-1 bg-indigo-600 hover:bg-indigo-700">
-          {isPending ? "保存中…" : "保存する"}
+          {isPending ? "保存中…" : editTask ? "更新する" : "保存する"}
         </Button>
       </div>
     </form>
