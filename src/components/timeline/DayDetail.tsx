@@ -4,13 +4,13 @@ import { useTransition } from "react";
 import { Task, Conversation } from "@/lib/types";
 import { updateTaskStatus, deleteTask } from "@/lib/actions/tasks";
 import { deleteConversation } from "@/lib/actions/conversations";
-import { Trash2, ChevronRight } from "lucide-react";
+import { Trash2, ChevronRight, Link2 } from "lucide-react";
 import { TaskStatus } from "@/lib/types";
 import { useRouter } from "next/navigation";
 
 const STATUS_COLORS: Record<TaskStatus, string> = {
   未着手: "bg-red-50 text-red-600 border-red-200",
-  進行中: "bg-yellow-50 text-yellow-600 border-yellow-200",
+  進行中: "bg-yellow-50 text-yellow-700 border-yellow-200",
   完了: "bg-green-50 text-green-600 border-green-200",
 };
 const STATUS_CYCLE: Record<TaskStatus, TaskStatus> = {
@@ -22,10 +22,11 @@ interface Props {
   tasks: Task[];
   conversations: Conversation[];
   onAddTask: () => void;
+  onEditTask: (task: Task) => void;
   onAddConversation: () => void;
 }
 
-export default function DayDetail({ date, tasks, conversations, onAddTask, onAddConversation }: Props) {
+export default function DayDetail({ date, tasks, conversations, onAddTask, onEditTask, onAddConversation }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const d = new Date(date + "T00:00:00");
@@ -62,18 +63,24 @@ export default function DayDetail({ date, tasks, conversations, onAddTask, onAdd
         ) : (
           <ul className="flex flex-col gap-2">
             {tasks.map((task) => (
-              <li key={task.id} className="flex items-start gap-3 rounded-lg border bg-white p-3">
-                <div className="flex-1">
+              <li key={task.id} className="flex items-start gap-2 rounded-lg border bg-white p-3">
+                <button onClick={() => onEditTask(task)} className="min-w-0 flex-1 text-left">
                   <p className={`text-sm font-medium ${task.status === "完了" ? "line-through text-muted-foreground" : ""}`}>{task.title}</p>
                   {task.memo && <p className="mt-1 text-xs text-muted-foreground">{task.memo}</p>}
-                </div>
-                <div className="flex items-center gap-2">
+                  {task.relatedIds.length > 0 && (
+                    <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                      <Link2 size={11} /> 関連 {task.relatedIds.length} 件
+                    </span>
+                  )}
+                </button>
+                <div className="flex shrink-0 items-center gap-1">
                   <button onClick={() => cycleStatus(task)}
-                    className={`rounded-full border px-2 py-0.5 text-xs font-medium transition-colors ${STATUS_COLORS[task.status]}`}>
+                    className={`flex min-h-[44px] items-center rounded-full border px-3 text-xs font-medium transition-colors ${STATUS_COLORS[task.status]}`}>
                     {task.status}
                   </button>
-                  <button onClick={() => handleDeleteTask(task.id)} className="text-muted-foreground hover:text-destructive">
-                    <Trash2 size={14} />
+                  <button onClick={() => handleDeleteTask(task.id)} aria-label="削除"
+                    className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive">
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </li>
@@ -103,8 +110,9 @@ export default function DayDetail({ date, tasks, conversations, onAddTask, onAdd
                       </div>
                     )}
                   </div>
-                  <button onClick={() => handleDeleteConv(conv.id)} className="shrink-0 text-muted-foreground hover:text-destructive">
-                    <Trash2 size={14} />
+                  <button onClick={() => handleDeleteConv(conv.id)} aria-label="削除"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive">
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </li>

@@ -7,6 +7,7 @@ export interface Task {
   dueDate: string | null; // ISO date string YYYY-MM-DD
   remindAt: string | null; // ISO datetime string（リマインド通知の送信予定日時。null = 通知なし）
   memo: string;
+  relatedIds: string[]; // 関連付けられたタスクのID一覧（対称）
   createdAt: string;
 }
 

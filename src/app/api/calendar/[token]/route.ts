@@ -47,6 +47,7 @@ export async function GET(
     dueDate: t.due_date,
     remindAt: t.remind_at,
     memo: t.memo ?? "",
+    relatedIds: [],
     createdAt: t.created_at,
   }));
 

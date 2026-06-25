@@ -35,6 +35,7 @@ export default function TimelineView({ tasks, conversations, personNames }: Prop
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [sheetMode, setSheetMode] = useState<"detail" | "add-task" | "add-conv" | "fab">("detail");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const todayRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -49,7 +50,7 @@ export default function TimelineView({ tasks, conversations, personNames }: Prop
   const dayConvs = (date: string) => conversations.filter((c) => c.date === date);
   const activeTasks = tasks.filter((t) => t.status !== "完了");
 
-  function afterSave() { setSheetOpen(false); router.refresh(); }
+  function afterSave() { setSheetOpen(false); setEditingTask(null); router.refresh(); }
 
   return (
     <div>
@@ -91,7 +92,7 @@ export default function TimelineView({ tasks, conversations, personNames }: Prop
                       <div key={t.id} className="flex items-center gap-2">
                         <span className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${
                           t.status === "未着手" ? "bg-red-50 text-red-600 border-red-200" :
-                          t.status === "進行中" ? "bg-yellow-50 text-yellow-600 border-yellow-200" :
+                          t.status === "進行中" ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
                           "bg-green-50 text-green-600 border-green-200"}`}>{t.status}</span>
                         <span className={`truncate text-sm ${t.status === "完了" ? "line-through text-muted-foreground" : "font-medium"}`}>{t.title}</span>
                       </div>
@@ -123,7 +124,7 @@ export default function TimelineView({ tasks, conversations, personNames }: Prop
           <SheetHeader className="px-4 pt-2 pb-0">
             <SheetTitle className="text-left text-base">
               {sheetMode === "fab" && "何を追加しますか？"}
-              {sheetMode === "add-task" && "タスクを追加"}
+              {sheetMode === "add-task" && (editingTask ? "タスクを編集" : "タスクを追加")}
               {sheetMode === "add-conv" && "会話を記録"}
               {sheetMode === "detail" && selectedDate && (() => {
                 const d = new Date(selectedDate + "T00:00:00");
@@ -152,7 +153,8 @@ export default function TimelineView({ tasks, conversations, personNames }: Prop
               date={selectedDate}
               tasks={dayTasks(selectedDate)}
               conversations={dayConvs(selectedDate)}
-              onAddTask={() => setSheetMode("add-task")}
+              onAddTask={() => { setEditingTask(null); setSheetMode("add-task"); }}
+              onEditTask={(t) => { setEditingTask(t); setSheetMode("add-task"); }}
               onAddConversation={() => setSheetMode("add-conv")}
             />
           )}
@@ -160,8 +162,10 @@ export default function TimelineView({ tasks, conversations, personNames }: Prop
           {sheetMode === "add-task" && (
             <TaskForm
               defaultDueDate={selectedDate ?? today}
+              editTask={editingTask ?? undefined}
+              allTasks={tasks}
               onSaved={afterSave}
-              onCancel={() => setSheetMode(selectedDate ? "detail" : "fab")}
+              onCancel={() => { setEditingTask(null); setSheetMode(selectedDate ? "detail" : "fab"); }}
             />
           )}
 

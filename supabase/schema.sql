@@ -49,6 +49,17 @@ CREATE TABLE push_subscriptions (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- 5c. task_links テーブル（タスク同士の関連付け・自己多対多）
+CREATE TABLE task_links (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  task_id         uuid NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  related_task_id uuid NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (task_id, related_task_id),
+  CHECK (task_id <> related_task_id)
+);
+
 -- 6. インデックス
 CREATE INDEX tasks_user_id_due_date    ON tasks (user_id, due_date);
 CREATE INDEX tasks_remind_at           ON tasks (remind_at) WHERE remind_at IS NOT NULL AND reminded_at IS NULL;
@@ -56,6 +67,8 @@ CREATE INDEX conversations_user_id_date ON conversations (user_id, date);
 CREATE INDEX conversations_person       ON conversations (user_id, person);
 CREATE UNIQUE INDEX profiles_calendar_token ON profiles (calendar_token);
 CREATE INDEX push_subscriptions_user_id ON push_subscriptions (user_id);
+CREATE INDEX task_links_task_id ON task_links (task_id);
+CREATE INDEX task_links_user_id ON task_links (user_id);
 
 -- 全文検索（pg_trgm、日本語ILIKE用）
 CREATE INDEX conversations_content_trgm ON conversations
@@ -82,6 +95,7 @@ ALTER TABLE tasks              ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversations      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE task_links         ENABLE ROW LEVEL SECURITY;
 
 -- tasks ポリシー
 CREATE POLICY "tasks: select own"  ON tasks FOR SELECT  USING (user_id = auth.uid());
@@ -105,6 +119,11 @@ CREATE POLICY "push: select own" ON push_subscriptions FOR SELECT USING (user_id
 CREATE POLICY "push: insert own" ON push_subscriptions FOR INSERT WITH CHECK (user_id = auth.uid());
 CREATE POLICY "push: update own" ON push_subscriptions FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 CREATE POLICY "push: delete own" ON push_subscriptions FOR DELETE USING (user_id = auth.uid());
+
+-- task_links ポリシー
+CREATE POLICY "task_links: select own" ON task_links FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "task_links: insert own" ON task_links FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "task_links: delete own" ON task_links FOR DELETE USING (user_id = auth.uid());
 
 -- 9. 新規ユーザー登録時に profiles を自動作成
 CREATE OR REPLACE FUNCTION handle_new_user()

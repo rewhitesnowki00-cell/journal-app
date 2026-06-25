@@ -112,7 +112,8 @@ export async function searchAll(query: string, person?: string) {
     })),
     tasks: (tasks ?? []).map((t) => ({
       id: t.id, title: t.title, status: t.status,
-      dueDate: t.due_date, remindAt: t.remind_at ?? null, memo: t.memo ?? "", createdAt: t.created_at,
+      dueDate: t.due_date, remindAt: t.remind_at ?? null, memo: t.memo ?? "",
+      relatedIds: [], createdAt: t.created_at,
     })),
   };
 }
