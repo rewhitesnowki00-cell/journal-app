@@ -19,6 +19,7 @@ export default function RecordTab({
   const [enemy, setEnemy] = useState("");
   const [result, setResult] = useState<BattleResult>("lose");
   const [oneShot, setOneShot] = useState(false);
+  const [movedFirst, setMovedFirst] = useState<boolean | null>(null); // true=先手 / false=後攻 / null=未記録
   const [enemyMove, setEnemyMove] = useState("");
   const [enemyItem, setEnemyItem] = useState("");
   const [enemyAction, setEnemyAction] = useState("");
@@ -46,13 +47,13 @@ export default function RecordTab({
     const my = activeNames.length > 0 ? selectedMy : myPokemon.trim();
     if (!my || !enemy.trim()) return;
     const payload = {
-      myPokemon: my, enemyPokemon: enemy.trim(), result, oneShot,
+      myPokemon: my, enemyPokemon: enemy.trim(), result, oneShot, movedFirst,
       enemyMove: enemyMove.trim(), enemyItem: enemyItem.trim(),
       enemyAction: enemyAction.trim(), memo: memo.trim(),
     };
     run(() => addBattle(payload), { success: "記録しました" }).then((ok) => {
       // 保存に成功したときだけ入力をクリア（失敗時は入力を残す）
-      if (ok) { setEnemy(""); setEnemyMove(""); setEnemyItem(""); setEnemyAction(""); setMemo(""); setOneShot(false); }
+      if (ok) { setEnemy(""); setEnemyMove(""); setEnemyItem(""); setEnemyAction(""); setMemo(""); setOneShot(false); setMovedFirst(null); }
     });
   }
 
@@ -93,6 +94,31 @@ export default function RecordTab({
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium">行動順（任意）</label>
+          <div className="flex gap-2">
+            <button type="button" aria-pressed={movedFirst === true}
+              onClick={() => setMovedFirst(movedFirst === true ? null : true)}
+              className={`flex-1 rounded-full border py-2 text-sm font-semibold transition-colors ${
+                movedFirst === true
+                  ? "border-indigo-600 bg-indigo-600 text-white"
+                  : "border-border bg-background text-muted-foreground"
+              }`}>
+              先手だった
+            </button>
+            <button type="button" aria-pressed={movedFirst === false}
+              onClick={() => setMovedFirst(movedFirst === false ? null : false)}
+              className={`flex-1 rounded-full border py-2 text-sm font-semibold transition-colors ${
+                movedFirst === false
+                  ? "border-indigo-600 bg-indigo-600 text-white"
+                  : "border-border bg-background text-muted-foreground"
+              }`}>
+              後攻だった
+            </button>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">もう一度タップで選択解除。「後攻のまま一撃負け」は最警戒の証拠になります。</p>
         </div>
 
         {result === "lose" && (
@@ -160,9 +186,10 @@ export default function RecordTab({
                 </span>
                 <div className="min-w-0 flex-1 text-sm">
                   <p><span className="font-medium">{b.myPokemon}</span> <span className="text-muted-foreground">vs</span> {b.enemyPokemon}</p>
-                  {(b.enemyMove || b.enemyItem || b.enemyAction || b.memo) && (
+                  {(b.movedFirst !== null || b.enemyMove || b.enemyItem || b.enemyAction || b.memo) && (
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       {[
+                        b.movedFirst === true ? "先手" : b.movedFirst === false ? "後攻" : "",
                         b.enemyMove && `技：${b.enemyMove}`,
                         b.enemyItem && `持ち物：${b.enemyItem}`,
                         b.enemyAction,

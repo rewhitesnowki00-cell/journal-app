@@ -40,6 +40,7 @@ export interface PokemonBattle {
   enemyPokemon: string;
   result: BattleResult;
   oneShot: boolean;      // 負けのとき true=一撃で落とされた / false=一発は耐えた
+  movedFirst: boolean | null; // true=先手 / false=後攻 / null=未記録
   enemyMove: string;     // 何の技でやられたか（負けのときのみ）
   enemyItem: string;     // 相手の持ち物（わかったときだけ）
   enemyAction: string;   // 相手の行動メモ

@@ -88,6 +88,7 @@ export async function getBattles(): Promise<PokemonBattle[]> {
     enemyPokemon: b.enemy_pokemon,
     result: b.result as BattleResult,
     oneShot: b.one_shot,
+    movedFirst: b.moved_first ?? null, // 005 未実行のDBでも null 扱いで安全に動く
     enemyMove: b.enemy_move ?? "",   // 004 未実行のDBでも ?? "" で安全に動く
     enemyItem: b.enemy_item ?? "",
     enemyAction: b.enemy_action ?? "",
@@ -101,6 +102,7 @@ export async function addBattle(data: {
   enemyPokemon: string;
   result: BattleResult;
   oneShot: boolean;
+  movedFirst: boolean | null;
   enemyMove: string;
   enemyItem: string;
   enemyAction: string;
@@ -114,6 +116,7 @@ export async function addBattle(data: {
     result: data.result,
     // 勝ちのときは「一撃」「とどめの技」は意味を持たないので空に固定
     one_shot: data.result === "lose" ? data.oneShot : false,
+    moved_first: data.movedFirst,
     enemy_move: data.result === "lose" ? data.enemyMove.trim() : "",
     enemy_item: data.enemyItem.trim(),
     enemy_action: data.enemyAction.trim(),
