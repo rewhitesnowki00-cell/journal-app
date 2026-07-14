@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, CheckSquare, Search, Settings } from "lucide-react";
+import { CalendarDays, CheckSquare, Search, Settings, Swords } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "タイムライン", icon: CalendarDays },
   { href: "/tasks", label: "タスク", icon: CheckSquare },
+  { href: "/pokemon", label: "ポケモン", icon: Swords },
   { href: "/search", label: "検索", icon: Search },
   { href: "/settings", label: "設定", icon: Settings },
 ];
